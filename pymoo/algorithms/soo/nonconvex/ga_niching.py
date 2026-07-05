@@ -6,6 +6,7 @@ from pymoo.algorithms.soo.nonconvex.ga import FitnessSurvival, GA
 from pymoo.core.survival import Survival
 from pymoo.docs import parse_doc_string
 from pymoo.operators.selection.tournament import compare, TournamentSelection
+from pymoo.util import default_random_state
 from pymoo.termination.cv import ConstraintViolationTermination
 from pymoo.termination.default import (
     DefaultSingleObjectiveTermination,
@@ -60,7 +61,8 @@ class NicheTermination(DefaultTermination):
 # =========================================================================================================
 
 
-def comp_by_cv_and_clearing_fitness(pop, P, **kwargs):
+@default_random_state
+def comp_by_cv_and_clearing_fitness(pop, P, random_state=None, **kwargs):
     S = np.full(P.shape[0], np.nan)
 
     for i in range(P.shape[0]):
@@ -75,6 +77,7 @@ def comp_by_cv_and_clearing_fitness(pop, P, **kwargs):
                 pop[b].CV,
                 method="smaller_is_better",
                 return_random_if_equal=True,
+                random_state=random_state,
             )
 
         # first compare by the round the individual was selected
@@ -90,6 +93,7 @@ def comp_by_cv_and_clearing_fitness(pop, P, **kwargs):
                     pop[b].get("rank"),
                     method="smaller_is_better",
                     return_random_if_equal=True,
+                    random_state=random_state,
                 )
 
     return S[:, None].astype(int)

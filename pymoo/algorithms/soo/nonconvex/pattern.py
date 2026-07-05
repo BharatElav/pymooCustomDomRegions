@@ -77,7 +77,9 @@ class PatternSearch(LocalSearch):
             self._rho = self.init_rho**self.n_not_improved
 
             # explore around the current center - try finding a suitable direction
-            self._explr = yield from exploration_move(self.problem, self._center, self._sign, self._delta, self._rho)
+            self._explr = yield from exploration_move(
+                self.problem, self._center, self._sign, self._delta, self._rho, random_state=self.random_state
+            )
 
         # if we have found a direction in the last iteration to be worth following
         else:
@@ -94,7 +96,9 @@ class PatternSearch(LocalSearch):
             self._sign = calc_sign(self._direction)
 
             # explore around the current center to try finding a suitable direction
-            self._explr = yield from exploration_move(self.problem, self._trial, self._sign, self._delta, self._rho)
+            self._explr = yield from exploration_move(
+                self.problem, self._trial, self._sign, self._delta, self._rho, random_state=self.random_state
+            )
 
         self.pop = Population.create(self._center, self._explr)
 

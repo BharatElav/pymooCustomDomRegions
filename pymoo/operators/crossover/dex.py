@@ -114,7 +114,7 @@ class DEX(Crossover):
                 Xp[m] = de_differential(X[:, m], F, random_state=random_state)
 
             # if still infeasible do a random initialization
-            Xp = repair_random_init(Xp, X[0], *problem.bounds())
+            Xp = repair_random_init(Xp, X[0], *problem.bounds(), random_state=random_state)
 
         if self.variant == "bin":
             M = mut_binomial(

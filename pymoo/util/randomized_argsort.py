@@ -14,7 +14,7 @@ def randomized_argsort(A, method="numpy", order="ascending", random_state=None):
         I = P[I]  # noqa: E741
 
     elif method == "quicksort":
-        I = quicksort(A)  # noqa: E741
+        I = quicksort(A, random_state=random_state)  # noqa: E741
 
     else:
         raise Exception("Randomized sort method not known.")

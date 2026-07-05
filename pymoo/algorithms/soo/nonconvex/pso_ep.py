@@ -48,7 +48,7 @@ def pso_rotation_invariant(V, X, P_X, L_X, inertia, c1, c2, random_state=None):
     G = (X + p + local_pos) / 3
     r = np.linalg.norm(G - X, axis=1, keepdims=True)
 
-    Vp = inertia * V + alea_sphere(G, r) - X
+    Vp = inertia * V + alea_sphere(G, r, random_state=random_state) - X
 
     return Vp
 

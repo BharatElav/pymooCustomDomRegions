@@ -6,11 +6,11 @@ from pymoo.core.mutation import Mutation
 from pymoo.operators.crossover.ox import random_sequence
 
 
-def inversion_mutation(y, seq, inplace=True):
+def inversion_mutation(y, seq, inplace=True, random_state=None):
     y = y if inplace else np.copy(y)
 
     if seq is None:
-        seq = random_sequence(len(y))
+        seq = random_sequence(len(y), random_state=random_state)
     start, end = seq
 
     y[start : end + 1] = np.flip(y[start : end + 1])

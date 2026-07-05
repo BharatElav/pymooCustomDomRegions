@@ -17,7 +17,7 @@ from pymoo.algorithms.moo.nsder import NSDER
 
 # Multi-objective algorithms
 from pymoo.algorithms.moo.nsga2 import NSGA2
-from pymoo.algorithms.moo.nsga3 import NSGA3
+from pymoo.algorithms.moo.nsga3 import NSGA3, comp_by_cv_then_random
 from pymoo.algorithms.moo.pinsga2 import AutomatedDM
 from pymoo.algorithms.moo.pinsga2 import PINSGA2
 from pymoo.algorithms.moo.rnsga2 import RNSGA2
@@ -25,7 +25,8 @@ from pymoo.algorithms.moo.rnsga3 import RNSGA3
 from pymoo.algorithms.moo.rvea import RVEA
 from pymoo.algorithms.moo.sms import SMSEMOA
 from pymoo.algorithms.moo.spea2 import SPEA2
-from pymoo.algorithms.moo.unsga3 import UNSGA3
+from pymoo.algorithms.moo.unsga3 import UNSGA3, comp_by_rank_and_ref_line_dist
+from pymoo.algorithms.soo.nonconvex.ga_niching import comp_by_cv_and_clearing_fitness
 from pymoo.optimize import minimize
 from pymoo.problems.multi import ZDT1
 
@@ -151,6 +152,49 @@ def test_multi_objective_deterministic(algorithm_class):
         rtol=1e-6,
         atol=1e-6,
         err_msg=f"Algorithm {algorithm_class.__name__} is not deterministic",
+    )
+
+
+def _tied_infeasible_pop(n=20):
+    """A population where every individual has an equal, positive CV.
+
+    This forces the constraint-violation branch of the NSGA3/UNSGA3 tournament
+    comparators, with ``a`` and ``b`` always tied — the exact path that must
+    forward ``random_state`` to stay reproducible (issue #794).
+    """
+    from pymoo.core.population import Population
+
+    rng = np.random.default_rng(0)
+    X = rng.random((n, 2))
+    pop = Population.new(X=X, F=X.copy(), G=np.ones((n, 1)))
+    return pop
+
+
+@pytest.mark.parametrize(
+    "comp",
+    [
+        pytest.param(comp_by_cv_then_random, id="nsga3"),
+        pytest.param(comp_by_rank_and_ref_line_dist, id="unsga3"),
+        pytest.param(comp_by_cv_and_clearing_fitness, id="niche_ga"),
+    ],
+)
+def test_tournament_comparator_forwards_random_state(comp):
+    """The comparators must thread the given random_state through compare().
+
+    A "run twice and compare res.F" test is a flaky detector here: whether the
+    unseeded tie-break perturbs the final result depends on downstream survival
+    and platform RNG behaviour, so it can pass despite the bug. Asserting the
+    contract directly — same seed in, same choice out — fails reliably when
+    random_state is dropped (issue #794).
+    """
+    pop = _tied_infeasible_pop()
+    P = np.array([[i, i + 1] for i in range(0, len(pop) - 1, 2)])
+
+    s1 = comp(pop, P, random_state=np.random.default_rng(123))
+    s2 = comp(pop, P, random_state=np.random.default_rng(123))
+
+    np.testing.assert_array_equal(
+        s1, s2, err_msg=f"{comp.__name__} does not forward random_state on the CV branch"
     )
 
 

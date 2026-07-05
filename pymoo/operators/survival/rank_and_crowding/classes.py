@@ -129,7 +129,7 @@ class ConstrRankAndCrowding(Survival):
         self.ranking = RankAndCrowding(nds=nds, crowding_func=crowding_func)
 
     def _do(  # type: ignore[override]
-        self, problem, pop, *args, n_survive=None, **kwargs
+        self, problem, pop, *args, n_survive=None, random_state=None, **kwargs
     ) -> Population:
         """Select survivors handling constraints and infeasibility.
 
@@ -138,6 +138,7 @@ class ConstrRankAndCrowding(Survival):
             pop: Population.
             *args: Additional positional arguments.
             n_survive: Number of individuals to survive.
+            random_state: Random state for reproducibility.
             **kwargs: Additional keyword arguments.
 
         Returns:
@@ -165,6 +166,7 @@ class ConstrRankAndCrowding(Survival):
                     pop[feas],
                     *args,
                     n_survive=min(len(feas), n_survive),
+                    random_state=random_state,
                     **kwargs,
                 )
 
@@ -192,7 +194,9 @@ class ConstrRankAndCrowding(Survival):
                     if len(survivors) + len(front) > n_survive:
                         # Obtain CV of front
                         CV = pop[infeas][front].get("CV").flatten()
-                        I = randomized_argsort(CV, order="ascending", method="numpy")  # noqa: E741
+                        I = randomized_argsort(  # noqa: E741
+                            CV, order="ascending", method="numpy", random_state=random_state
+                        )
                         I = I[: (n_survive - len(survivors))]  # noqa: E741
 
                     # Otherwise take the whole front unsorted
@@ -203,6 +207,8 @@ class ConstrRankAndCrowding(Survival):
                     survivors = Population.merge(survivors, pop[infeas][front[I]])
 
         else:
-            survivors = self.ranking.do(problem, pop, *args, n_survive=n_survive, **kwargs)
+            survivors = self.ranking.do(
+                problem, pop, *args, n_survive=n_survive, random_state=random_state, **kwargs
+            )
 
         return survivors
