@@ -7,8 +7,8 @@ from numpy.typing import NDArray
 from pymoo.core.callback import Callback
 from pymoo.core.algorithm import Algorithm
 from pymoo.indicators.hv import Hypervolume
-from pymoo.indicators.igd import IGD
 from pymoo.termination.ftol import calc_delta_norm
+from pymoo.util.misc import igd
 from pymoo.util.normalization import normalize
 from pymoo.util.sliding_window import SlidingWindow
 from pymoo.visualization.video.callback_video import AnimationCallback
@@ -72,7 +72,7 @@ class RunningMetric(Callback):
 
         # now calculate the indicator from each previous one to the current
         if self.indicator == "igd":
-            delta_f = [IGD(c_N).do(N[k]) for k in range(len(N))]
+            delta_f = [igd(N[k], c_N) for k in range(len(N))]
         elif self.indicator == "hv":
             hv = Hypervolume(ref_point=np.ones(c_F.shape[1]))  # type: ignore[arg-type]
             delta_f = [hv.do(N[k]) for k in range(len(N))]

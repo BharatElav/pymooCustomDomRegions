@@ -46,3 +46,45 @@ def test_nds_only_first_front():
     front0 = NonDominatedSorting().do(F, only_non_dominated_front=True)
     all_fronts = NonDominatedSorting().do(F)
     np.testing.assert_array_equal(np.sort(front0), np.sort(all_fronts[0]))
+
+
+def reference_ranks(F):
+    # naive O(N^2 M) non-dominated ranking, correct at any dimension
+    n = len(F)
+    ranks = np.full(n, -1)
+    remaining = set(range(n))
+    r = 0
+    while remaining:
+        idx = list(remaining)
+        front = [
+            i
+            for i in idx
+            if not any(
+                j != i and np.all(F[j] <= F[i]) and np.any(F[j] < F[i]) for j in idx
+            )
+        ]
+        for i in front:
+            ranks[i] = r
+            remaining.discard(i)
+        r += 1
+    return ranks
+
+
+def test_nds_above_moocore_objective_limit():
+    # moocore's native pareto_rank supports at most 255 objectives; above that
+    # pymoo must fall back to its own implementation instead of failing
+    rng = np.random.default_rng(1)
+    base = rng.random((30, 3))
+    F = np.hstack([base, np.zeros((30, 300 - 3))])
+
+    _, ranks = NonDominatedSorting().do(F, return_rank=True)
+    np.testing.assert_array_equal(ranks, reference_ranks(F))
+
+
+def test_find_non_dominated_above_moocore_objective_limit():
+    rng = np.random.default_rng(2)
+    base = rng.random((30, 3))
+    F = np.hstack([base, np.zeros((30, 300 - 3))])
+
+    expected = np.where(reference_ranks(F) == 0)[0]
+    np.testing.assert_array_equal(np.sort(find_non_dominated(F)), expected)

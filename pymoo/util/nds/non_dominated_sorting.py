@@ -7,6 +7,10 @@ from moocore import pareto_rank, is_nondominated
 
 from pymoo.util.dominator import Dominator
 
+# moocore's native functions support at most 255 objectives (the range of its
+# C dimension type); beyond that pymoo falls back to its own implementation
+MOOCORE_MAX_OBJECTIVES = 255
+
 
 class NonDominatedSorting:
     def __init__(self, epsilon=None, method="fast_non_dominated_sort", dominator=None) -> None:
@@ -31,7 +35,7 @@ class NonDominatedSorting:
 
         if len(F) == 0:
             fronts = []
-        elif self.dominator is None:
+        elif self.dominator is None and F.shape[1] <= MOOCORE_MAX_OBJECTIVES:
             F_sort = F - self.epsilon if self.epsilon is not None else F
             ranks = pareto_rank(F_sort)
             fronts = []
@@ -83,7 +87,7 @@ def rank_from_fronts(fronts, n):
 def find_non_dominated(F, _F=None):
     if len(F) == 0:
         return np.array([], dtype=int)
-    if _F is None:
+    if _F is None and F.shape[1] <= MOOCORE_MAX_OBJECTIVES:
         return np.where(is_nondominated(F.astype(float), keep_weakly=True))[0]
     else:
         M = Dominator.calc_domination_matrix(F, _F)

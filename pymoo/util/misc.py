@@ -387,6 +387,33 @@ def vectorized_cdist(
     return M
 
 
+def igd(F: Any, ref: Any) -> float:
+    """Inverted Generational Distance (Euclidean, p=1).
+
+    For each point in the reference set, the minimum Euclidean distance to the
+    set ``F`` is computed; the result is the mean of those distances. This is a
+    pure-numpy equivalent of ``moocore.igd`` (for minimisation) that has no
+    upper bound on the number of columns.
+
+    Args:
+        F: Set of points (rows are points, columns are objectives/variables).
+        ref: Reference set with the same number of columns as ``F``.
+
+    Returns:
+        The IGD value.
+    """
+    F = at_least_2d_array(F, extend_as="row")
+    ref = at_least_2d_array(ref, extend_as="row")
+
+    if F.shape[1] != ref.shape[1]:
+        raise ValueError(
+            f"F and ref need to have the same number of columns ({F.shape[1]} != {ref.shape[1]})"
+        )
+
+    D = vectorized_cdist(ref, F, func_dist=func_euclidean_distance)
+    return float(np.mean(np.min(D, axis=1)))
+
+
 def covert_to_type(problem: Any, X: Any) -> Any:
     """Convert solution array to problem variable type.
 

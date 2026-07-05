@@ -2,8 +2,8 @@
 
 import numpy as np
 
-from pymoo.indicators.igd import IGD
 from pymoo.termination.delta import DeltaToleranceTermination
+from pymoo.util.misc import igd
 from pymoo.util.normalization import normalize
 
 
@@ -18,7 +18,7 @@ class DesignSpaceTermination(DeltaToleranceTermination):
 
     def _delta(self, prev, current):
         try:
-            return IGD(current.astype(float)).do(prev.astype(float))
+            return igd(prev.astype(float), current.astype(float))
         except Exception:  # noqa: E722
             return np.inf
 

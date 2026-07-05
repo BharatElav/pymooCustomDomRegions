@@ -96,6 +96,7 @@ Building docs executes ~126 notebooks (real optimization) then renders HTML. Exe
 - Match existing patterns before inventing new ones. Core abstractions: `Problem`, `Algorithm`, `Operator`, `Population`, `Individual`, `Result`. Main entry point: `from pymoo.optimize import minimize`.
 - Performance-critical code has **Cython** counterparts in `pymoo/functions/`; check `is_compiled()`.
 - Adjust numerical tolerances (`atol`/`rtol`) rather than chasing exact float equality in tests.
+- **Native/C dependencies can crash uncatchably** (segfault / Windows access violation) — a Python `try/except` will **not** save you (learned from #793: native `moocore.igd` overflowed a stack buffer for `dim > 31` and killed the interpreter). When calling into a compiled dep: (1) validate inputs (shape, dimension, NaN/inf, empty) *before* the call, not after; (2) know its documented contract and stay inside it, or add a guard/pure-Python fallback for inputs outside it; (3) on hot control-flow paths (termination, callbacks) where a crash aborts the whole run, prefer a pure-numpy path — native speed rarely matters for a per-generation scalar but the crash risk does; (4) fix locally *and* report upstream, don't block the release on the upstream fix. Platform note: such bugs often only crash on Windows/MSVC (`/GS` stack cookies) while Linux silently returns wrong numbers — test the boundary explicitly.
 
 ## Project structure
 

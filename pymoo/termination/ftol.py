@@ -3,7 +3,7 @@
 import numpy as np
 
 from pymoo.indicators.hv import Hypervolume
-from pymoo.indicators.igd import IGD
+from pymoo.util.misc import igd
 from pymoo.util.normalization import normalize
 from pymoo.termination.delta import DeltaToleranceTermination
 
@@ -83,7 +83,7 @@ class MultiObjectiveSpaceTermination(DeltaToleranceTermination):
         p_N = normalize(p_F, c_ideal, c_nadir)
 
         # calculate IGD from one to another
-        delta_f = IGD(c_N).do(p_N)
+        delta_f = igd(p_N, c_N)
 
         # store the delta values to the object
         self.delta_ideal, self.delta_nadir, self.delta_f = (
@@ -123,12 +123,12 @@ class MultiObjectiveSpaceTerminationWithRenormalization(MultiObjectiveSpaceTermi
         if self.all_to_current:
             c_N = normalize(c_F, c_ideal, c_nadir)
             if self.indicator == "igd":
-                delta_f = [IGD(c_N).do(N[k]) for k in range(len(N))]
+                delta_f = [igd(N[k], c_N) for k in range(len(N))]
             elif self.indicator == "hv":
                 hv = Hypervolume(ref_point=np.ones(c_F.shape[1]))
                 delta_f = [hv.do(N[k]) for k in range(len(N))]
         else:
-            delta_f = [IGD(N[k + 1]).do(N[k]) for k in range(len(N) - 1)]
+            delta_f = [igd(N[k], N[k + 1]) for k in range(len(N) - 1)]
 
         ret["delta_f"] = delta_f
 
