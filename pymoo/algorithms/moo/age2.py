@@ -73,6 +73,11 @@ class AGEMOEA2(GeneticAlgorithm):
 @jit(nopython=True, fastmath=True)
 def project_on_manifold(point, p):
     dist = np.sum(point[point > 0] ** p) ** (1 / p)
+    # a point with no positive components (e.g. a normalized front point at the
+    # origin, all objectives equal the ideal) has dist == 0; the projection is
+    # undefined there, so leave it unchanged instead of dividing by zero.
+    if dist == 0:
+        return point.copy()
     return np.multiply(point, 1 / dist)
 
 
