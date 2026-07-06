@@ -104,6 +104,9 @@ parallelization = [
 ]
 others = [
     "optuna",
+    # comocma provides COMO-CMA-ES (pymoo.algorithms.moo.como_cmaes.COMOCMAES),
+    # a competitive multi-objective CMA-ES; imported lazily only when used.
+    "comocma",
 ]
 visualization = [
     # matplotlib (static plots) is already a core dependency; this extra adds the
