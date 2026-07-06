@@ -24,7 +24,7 @@ class COMOCMAES(Algorithm):
     reference point is estimated from the initial sample.
     """
 
-    def __init__(self, pop_size=32, sigma=0.2, reference_point=None,
+    def __init__(self, pop_size=32, sigma=0.2, reference_point=None, ref_factor=1e6,
                  sampling=FloatRandomSampling(), output=MultiObjectiveOutput(), **kwargs):
         """Initialize COMO-CMA-ES.
 
@@ -32,11 +32,13 @@ class COMOCMAES(Algorithm):
             pop_size: Number of CMA-ES kernels — roughly the number of Pareto-front
                 points sought. Each kernel is a full CMA-ES.
             sigma: Initial step size in the normalized ``[0, 1]`` decision space.
-            reference_point: Hypervolume reference point for the UHVI indicator.
-                COMO-CMA-ES is sensitive to it; pass the problem's known nadir when
-                available. If ``None`` it is estimated from the initial sample,
-                which works when the objective ranges are stable but can be poor
-                on problems whose scale collapses during convergence (e.g. ZDT).
+            reference_point: Hypervolume reference point for the UHVI indicator. If
+                ``None`` a large *equal* reference point ``[R, R]`` is used with
+                ``R = ref_factor * max|F|`` from the initial sample; the equal, far
+                reference keeps the two objectives' contributions balanced regardless
+                of their scales, which is robust on well-scaled problems (pass an
+                explicit nadir for extreme per-objective scale disparities).
+            ref_factor: Multiplier for the automatic reference point (see above).
             sampling: Sampling used for the initial population / reference estimate.
             output: Display output used to report progress during the run.
             **kwargs: Additional keyword arguments forwarded to ``Algorithm``.
@@ -45,6 +47,7 @@ class COMOCMAES(Algorithm):
         self.pop_size = pop_size
         self.sigma0 = sigma
         self.reference_point = reference_point
+        self.ref_factor = ref_factor
         self.sampling = sampling
         self.norm = None
         self.moes = None
@@ -73,10 +76,10 @@ class COMOCMAES(Algorithm):
         if self.reference_point is not None:
             ref_point = list(self.reference_point)
         else:
-            # estimate: nadir of the initial sample, pushed out by a margin
-            F = infills.get("F")
-            lo, hi = F.min(axis=0), F.max(axis=0)
-            ref_point = (hi + 0.1 * (hi - lo)).tolist()
+            # a large *equal* reference point balances the two objectives'
+            # hypervolume contributions regardless of their scales
+            r = self.ref_factor * max(1.0, float(np.abs(infills.get("F")).max()))
+            ref_point = [r] * self.problem.n_obj
 
         x0 = [list(rs.random(n)) for _ in range(self.pop_size)]
         seed = int(rs.integers(0, 2**31 - 1))
@@ -88,7 +91,9 @@ class COMOCMAES(Algorithm):
         self.pop = infills
 
     def _infill(self):
-        self._sols = self.moes.ask()
+        # ask("all") advances every kernel each generation (parallel mode) — far
+        # more effective than the default sequential single-kernel ask()
+        self._sols = self.moes.ask("all")
         return Population.new(X=self.norm.backward(np.array(self._sols)))
 
     def _advance(self, infills=None, **kwargs):
