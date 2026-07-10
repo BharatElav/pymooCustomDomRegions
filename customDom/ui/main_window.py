@@ -17,36 +17,38 @@ class MainWindow(QMainWindow):
         self.centerWindow()
 
         # Background Configuratiomn
-        # self.configBg()
+        self.configBg()
 
         # Layout Configuration
         self.configMainLayout()
-        self.testLayout()
     
     # Configure Window
     def configWindow(self):
         # Set Window Title
         self.setWindowTitle("Custom Domination Maker")
-        self.resize(1562, 770)
+        self.resize(1588, 783)
 
         # Set Window Icon
         icon_path = os.path.join(self.base_dir, "moo.png")
         self.setWindowIcon(QIcon(icon_path))
+
+        # Block Resizing
+        self.setFixedSize(self.width(), self.height())  # no resizing at all
 
     # Center Window
     def centerWindow(self):
         # Grab User's Screen Dimensions and Center the Window
         screen = QApplication.primaryScreen().geometry()
         self.move(
-            (screen.width() - window.width()) // 2, 
-            (screen.height() - window.height()) // 2
+            (screen.width() - self.width()) // 2, 
+            (screen.height() - self.height()) // 2
         )
 
     # Configure Background Template
     def configBg(self):
         # Create Label
         labelImg = QLabel(self)
-        labelImg.setGeometry(0, 0, self.width(), self.height())
+        labelImg.setGeometry(13, 13, self.width() - 26, self.height() - 26) # Adjusting for default margins
         
         # Find the Image
         bg_path = os.path.join(self.base_dir, "nsga2excalidraw.png")
@@ -64,19 +66,19 @@ class MainWindow(QMainWindow):
 
         # Create Layout
         mainLayout = QHBoxLayout(central)
-        mainLayout.addWidget(self.canvas, stretch=3) 
-        mainLayout.addWidget(self.toolPanel, stretch=1)
+        mainLayout.addWidget(self.canvas, stretch=43) 
+        mainLayout.addWidget(self.toolPanel, stretch=50)
 
-    # Layout Color Testing
-    def testLayout(self):
-        self.canvas.setStyleSheet("background-color: #1e1e1e;")
-        self.toolPanel.setStyleSheet("background-color: #2b2b2b;")
+        # Configure Background Colors 
+        self.toolPanel.setStyleSheet("background-color: rgba(43, 43, 43, 180);")
 
+# Create the App and Window, Show the Window and Start the App
 def main():
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())
 
+# Only Execute this File if its Run Directly
 if __name__ == "__main__":
     main()
