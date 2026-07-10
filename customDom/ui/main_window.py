@@ -6,27 +6,26 @@ from PyQt5.QtGui import QIcon, QPixmap
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        # Global Scope Setup
+        self.base_dir = os.path.dirname(os.path.abspath(__file__))
 
-        # Window Configuration
+        # Window Setup
+        self.configWindow()
+        self.centerWindow()
+
+        # Background Configuratiomn
+        self.configBg()
+    
+    # Configure Window
+    def configWindow(self):
         self.setWindowTitle("Custom Domination Maker")
         self.resize(1562, 770)
 
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        icon_path = os.path.join(base_dir, "moo.png")
+        icon_path = os.path.join(self.base_dir, "moo.png")
         self.setWindowIcon(QIcon(icon_path))
 
-        # Background Configuratiomn
-        labelImg = QLabel(self)
-        labelImg.setGeometry(0, 0, 1562, 770)
-        
-        bg_path = os.path.join(base_dir, "nsga2excalidraw.png")
-        pixmap = QPixmap(bg_path)
-        
-        labelImg.setPixmap(pixmap)
-        labelImg.setScaledContents(True)
-    
     # Center Window
-    def center(self):
+    def centerWindow(self):
         screen = QApplication.primaryScreen().geometry()
         window = self.geometry()
         self.move(
@@ -34,7 +33,16 @@ class MainWindow(QMainWindow):
             (screen.height() - window.height()) // 2
         )
 
-
+    # Configure Background Template
+    def configBg(self):
+        labelImg = QLabel(self)
+        labelImg.setGeometry(0, 0, self.width(), self.height())
+        
+        bg_path = os.path.join(self.base_dir, "nsga2excalidraw.png")
+        pixmap = QPixmap(bg_path)
+        
+        labelImg.setPixmap(pixmap)
+        labelImg.setScaledContents(True)
 
 def main():
     app = QApplication(sys.argv)
