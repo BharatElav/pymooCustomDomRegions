@@ -10,7 +10,10 @@ class MainWindow(QMainWindow):
         # Global Scope Setup
         self.base_dir = os.path.dirname(os.path.abspath(__file__))
         self.canvas = pg.PlotWidget()
-        self.toolPanel = QWidget()
+        self.mainPanel = QWidget()
+        self.panel1 = QWidget()
+        self.panel2 = QWidget()
+        self.panel3 = QWidget()
 
         # Window Setup
         self.configWindow()
@@ -21,6 +24,7 @@ class MainWindow(QMainWindow):
 
         # Layout Configuration
         self.configMainLayout()
+        self.configMainPanel()
     
     # Configure Window
     def configWindow(self):
@@ -67,10 +71,24 @@ class MainWindow(QMainWindow):
         # Create Layout
         mainLayout = QHBoxLayout(central)
         mainLayout.addWidget(self.canvas, stretch=43) 
-        mainLayout.addWidget(self.toolPanel, stretch=50)
+        mainLayout.addWidget(self.mainPanel, stretch=50)
 
         # Configure Background Colors 
-        self.toolPanel.setStyleSheet("background-color: rgba(43, 43, 43, 180);")
+        self.mainPanel.setStyleSheet("background-color: rgba(43, 43, 43, 180);")
+
+    # Confiure Main Panel
+    def configMainPanel(self):
+        # Create Layout
+        mainPanelLayout = QHBoxLayout(self.mainPanel)
+        mainPanelLayout.addWidget(self.panel1, stretch=4)
+        mainPanelLayout.addWidget(self.panel2, stretch=3)
+        mainPanelLayout.addWidget(self.panel3, stretch=3)
+
+        # Configure Background Colors
+        self.panel1.setStyleSheet("background-color: rgba(255, 0, 0, 180);")
+        self.panel2.setStyleSheet("background-color: rgba(0, 255, 0, 180);")
+        self.panel3.setStyleSheet("background-color: rgba(0, 0, 255, 180);")
+
 
 # Create the App and Window, Show the Window and Start the App
 def main():
