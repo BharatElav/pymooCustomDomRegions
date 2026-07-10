@@ -9,7 +9,7 @@ class MainWindow(QMainWindow):
 
         # Window Configuration
         self.setWindowTitle("Custom Domination Maker")
-        self.resize(781, 385)
+        self.resize(1562, 770)
 
         base_dir = os.path.dirname(os.path.abspath(__file__))
         icon_path = os.path.join(base_dir, "moo.png")
@@ -17,9 +17,8 @@ class MainWindow(QMainWindow):
 
         # Background Configuratiomn
         labelImg = QLabel(self)
-        labelImg.setGeometry(0, 0, 781, 385)
+        labelImg.setGeometry(0, 0, 1562, 770)
         
-        base_dir = os.path.dirname(os.path.abspath(__file__))
         bg_path = os.path.join(base_dir, "nsga2excalidraw.png")
         pixmap = QPixmap(bg_path)
         
