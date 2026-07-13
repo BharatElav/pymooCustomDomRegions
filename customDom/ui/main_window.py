@@ -1,6 +1,6 @@
 import os
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QHBoxLayout, QVBoxLayout, QWidget, QPushButton, QSizePolicy
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QHBoxLayout, QVBoxLayout, QWidget, QPushButton, QSizePolicy, QComboBox
 from PyQt5.QtGui import QIcon, QPixmap
 import pyqtgraph as pg
 
@@ -19,6 +19,9 @@ class MainWindow(QMainWindow):
         # Panel 1 Widgets
         self.toolOptions = QWidget()
         self.plotButton = QPushButton("Plot")
+
+        # Tool Options Panel
+        self.toolSelector = QComboBox()
 
         # Window Setup
         self.configWindow()
@@ -115,6 +118,10 @@ class MainWindow(QMainWindow):
         toolOptionsLabel.setStyleSheet("background-color: rgba(255, 255, 255, 180);")
         self.toolOptions.setStyleSheet("background-color: rgba(255, 255, 255, 180);")
         self.plotButton.setStyleSheet("background-color: rgba(255, 255, 255, 180);")
+
+    # Configure Tool Options Panel
+    def configToolOptionsPanel(self):
+        pass
 
 # Create the App and Window, Show the Window and Start the App
 def main():
