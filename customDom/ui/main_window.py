@@ -1,6 +1,6 @@
 import os
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QHBoxLayout, QWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QHBoxLayout, QVBoxLayout, QWidget, QPushButton, QSizePolicy
 from PyQt5.QtGui import QIcon, QPixmap
 import pyqtgraph as pg
 
@@ -8,12 +8,17 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         # Global Scope Setup
+        # Layout Setups
         self.base_dir = os.path.dirname(os.path.abspath(__file__))
         self.canvas = pg.PlotWidget()
         self.mainPanel = QWidget()
         self.panel1 = QWidget()
         self.panel2 = QWidget()
         self.panel3 = QWidget()
+
+        # Panel 1 Widgets
+        self.toolOptions = QWidget()
+        self.plotButton = QPushButton("Plot")
 
         # Window Setup
         self.configWindow()
@@ -25,6 +30,7 @@ class MainWindow(QMainWindow):
         # Layout Configuration
         self.configMainLayout()
         self.configMainPanel()
+        self.configPanel1()
     
     # Configure Window
     def configWindow(self):
@@ -89,6 +95,26 @@ class MainWindow(QMainWindow):
         self.panel2.setStyleSheet("background-color: rgba(0, 255, 0, 180);")
         self.panel3.setStyleSheet("background-color: rgba(0, 0, 255, 180);")
 
+    # Configure Panel 1 (Tools, Shade Options, Plot Button)
+    def configPanel1(self):
+        # Create Layout
+        panel1Layout = QVBoxLayout(self.panel1)
+
+        # Create Local Widgets
+        toolOptionsLabel = QLabel("Tool Options")   
+
+        # Configure Plot Button Widget to be able to be Stretched
+        self.plotButton.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        # Add Widgets to Panel
+        panel1Layout.addWidget(toolOptionsLabel, stretch=1)
+        panel1Layout.addWidget(self.toolOptions, stretch=20)
+        panel1Layout.addWidget(self.plotButton, stretch=2)
+
+        # Configure Background Colors
+        toolOptionsLabel.setStyleSheet("background-color: rgba(255, 255, 255, 180);")
+        self.toolOptions.setStyleSheet("background-color: rgba(255, 255, 255, 180);")
+        self.plotButton.setStyleSheet("background-color: rgba(255, 255, 255, 180);")
 
 # Create the App and Window, Show the Window and Start the App
 def main():
