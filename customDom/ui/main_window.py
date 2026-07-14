@@ -1,6 +1,6 @@
 import os
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QHBoxLayout, QVBoxLayout, QWidget, QPushButton, QSizePolicy, QComboBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QHBoxLayout, QVBoxLayout, QWidget, QPushButton, QSizePolicy, QComboBox, QStackedWidget
 from PyQt5.QtGui import QIcon, QPixmap
 import pyqtgraph as pg
 
@@ -17,12 +17,13 @@ class MainWindow(QMainWindow):
         self.panel3 = QWidget()
 
         # Panel 1 Widgets
-        self.toolPanel = QWidget()
-        self.toolSelector = QComboBox()
+        self.toolSelectorPanel = QWidget()
+        self.toolOptionsPanel = QStackedWidget()
+        self.shadePanel = QWidget()
         self.plotButton = QPushButton("Plot")
 
         # Tool Options Panel
-
+        self.toolSelectorBox = QComboBox()
 
         # Window Setup
         self.configWindow()
@@ -35,6 +36,7 @@ class MainWindow(QMainWindow):
         self.configMainLayout()
         self.configMainPanel()
         self.configPanel1()
+        self.configToolSelectorPanel()
     
     # Configure Window
     def configWindow(self):
@@ -104,30 +106,40 @@ class MainWindow(QMainWindow):
         # Create Layout
         panel1Layout = QVBoxLayout(self.panel1)
 
-        # Create Local Widgets
-        toolOptionsLabel = QLabel("Tool Selector")   
-
         # Configure Plot Button Widget to be able to be Stretched
         self.plotButton.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-        # Configure Tool Selector Options
-        self.toolSelector.addItems(["Line Tool", "Circle Tool"])
-
         # Add Widgets to Panel
-        panel1Layout.addWidget(toolOptionsLabel, stretch=1)
-        panel1Layout.addWidget(self.toolSelector, stretch=1)
-        panel1Layout.addWidget(self.toolPanel, stretch=20)
+        panel1Layout.addWidget(self.toolSelectorPanel, stretch=5)
+        panel1Layout.addWidget(self.toolOptionsPanel, stretch=20)
+        panel1Layout.addWidget(self.shadePanel, stretch=5)
         panel1Layout.addWidget(self.plotButton, stretch=2)
 
         # Configure Background Colors
-        toolOptionsLabel.setStyleSheet("background-color: rgba(255, 255, 255, 180);")
-        self.toolSelector.setStyleSheet("background-color: rgba(255, 255, 255, 180);")
-        self.toolPanel.setStyleSheet("background-color: rgba(255, 255, 255, 180);")
-        self.plotButton.setStyleSheet("background-color: rgba(255, 255, 255, 180);")
+        self.toolSelectorPanel.setStyleSheet("background-color: rgba(0, 0, 0, 180);")
+        self.toolOptionsPanel.setStyleSheet("background-color: rgba(0, 0, 0, 180);")
+        self.shadePanel.setStyleSheet("background-color: rgba(0, 0, 0, 180);")
+        self.plotButton.setStyleSheet("background-color: rgba(0, 0, 0, 180);")
 
     # Configure Tool Options Panel
-    def configToolOptionsPanel(self):
-        self.toolSelector.addItems(["Line Tool", "Circle Tool"])
+    def configToolSelectorPanel(self):
+        # Create Layout
+        toolSelectorPanelLayout = QVBoxLayout(self.toolSelectorPanel)
+
+        # Create Local Widgets
+        toolSelectorLabel = QLabel("Tool Selector") 
+
+        # Configure Tool Selector Options
+        self.toolSelectorBox.addItems(["Line Tool", "Circle Tool"])
+
+        # Add Widgets to Panel
+        toolSelectorPanelLayout.addWidget(toolSelectorLabel)
+        toolSelectorPanelLayout.addWidget(self.toolSelectorBox)
+
+        # Configure Background Colors
+        toolSelectorLabel.setStyleSheet("background-color: rgba(255, 255, 255, 180);")
+        self.toolSelectorBox.setStyleSheet("background-color: rgba(255, 255, 255, 180);")
+
 
 
 # Create the App and Window, Show the Window and Start the App
