@@ -110,10 +110,10 @@ class MainWindow(QMainWindow):
         self.plotButton.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # Add Widgets to Panel
-        panel1Layout.addWidget(self.toolSelectorPanel, stretch=5)
-        panel1Layout.addWidget(self.toolOptionsPanel, stretch=20)
-        panel1Layout.addWidget(self.shadePanel, stretch=5)
-        panel1Layout.addWidget(self.plotButton, stretch=2)
+        panel1Layout.addWidget(self.toolSelectorPanel, stretch=3)
+        panel1Layout.addWidget(self.toolOptionsPanel, stretch=16)
+        panel1Layout.addWidget(self.shadePanel, stretch=3)
+        panel1Layout.addWidget(self.plotButton, stretch=3)
 
         # Configure Background Colors
         self.toolSelectorPanel.setStyleSheet("background-color: rgba(0, 0, 0, 180);")
